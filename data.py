@@ -2,7 +2,6 @@ import os
 import newspaper
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from tensorflow.keras.preprocessing import one_hot
 
 import nltk
 from nltk import word_tokenize
@@ -77,37 +76,34 @@ def scrape_data(article_type, url_list):
     return df
 
 
-def get_scraped_date(urls):
-    if(os.path.exists('reliable_scraped_articles.csv') and os.path.exists('unreliable_scraped_articles.csv')):
-        reliable_articles = pd.read_csv('reliable_scraped_articles.csv')
-        unreliable_articles = pd.read_csv('unreliable_scraped_articles.csv')
+def get_scraped_data(urls):
+    if(os.path.exists('./Data/reliable_scraped_articles.csv') and os.path.exists('./Data/unreliable_scraped_articles.csv')):
+        reliable_articles = pd.read_csv('./Data/reliable_scraped_articles.csv')
+        unreliable_articles = pd.read_csv(
+            './Data/unreliable_scraped_articles.csv')
     else:
         reliable_articles = scrape_data('reliable', urls['reliable'])
         unreliable_articles = scrape_data('unreliable', urls['unreliable'])
-    return pd.concat([reliable_articles, unreliable_articles])
+    return pd.concat([reliable_articles, unreliable_articles], ignore_index=True)
+
+
+def get_data(urls):
+    scraped_data = get_scraped_data(urls)
+    reliable_data = pd.read_csv('./Data/reliable_articles.csv')
+    unreliable_data = pd.read_csv('./Data/unreliable_articles.csv')
+    data = pd.concat([scraped_data, reliable_data,
+                      unreliable_data], ignore_index=True)
+    return data
 
 
 def tfidf_vectorize(corpus):
     vectorizer = TfidfVectorizer()
-    vectorized_text = vectorizer.fit_transform(text)
-    return vectorized_text
-
-
-def one_hot_vectorization(corpus, vocab_size):
-    return [one_hot(text, vocab_size) for text in corpus]
+    vectorized_corpus = vectorizer.fit_transform(corpus)
+    return vectorized_corpus
 
 
 if __name__ == '__main__':
     # get_scraped_date(urls)
+    data = get_data(urls)
 
-    fakeScraped = pd.read_csv("data/unreliable_scraped_articles.csv")
-    trueScraped = pd.read_csv("data/reliable_scraped_articles.csv")
-
-    preprocess_words(fakeScraped)
-    preprocess_words(trueScraped)
-
-    print("FAKESCRAPED HEAD")
-    print(fakeScraped.head())
-    
-    print("TRUESCRAPED HEAD")
-    print(trueScraped.head())
+    print(data.head())
