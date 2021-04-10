@@ -47,13 +47,13 @@ def scrape_data(article_type, url_list):
 
 
 def get_scraped_data(urls):
-    if(os.path.exists('./Data/reliable_scraped_articles.csv') and os.path.exists('./Data/unreliable_scraped_articles.csv')):
-        reliable_articles = pd.read_csv('./Data/reliable_scraped_articles.csv')
-        unreliable_articles = pd.read_csv(
-            './Data/unreliable_scraped_articles.csv')
-    else:
-        reliable_articles = scrape_data('reliable', urls['reliable'])
-        unreliable_articles = scrape_data('unreliable', urls['unreliable'])
+    # if(os.path.exists('./Data/reliable_scraped_articles.csv') and os.path.exists('./Data/unreliable_scraped_articles.csv')):
+    #    reliable_articles = pd.read_csv('./Data/reliable_scraped_articles.csv')
+    #    unreliable_articles = pd.read_csv(
+    #        './Data/unreliable_scraped_articles.csv')
+    # else:
+    reliable_articles = scrape_data('reliable', urls['reliable'])
+    unreliable_articles = scrape_data('unreliable', urls['unreliable'])
     return pd.concat([reliable_articles, unreliable_articles], ignore_index=True)
 
 
@@ -73,5 +73,5 @@ def tfidf_vectorize(corpus):
 
 
 if __name__ == '__main__':
-    # get_scraped_date(urls)
-    data = get_data(urls)
+    get_scraped_data(urls)
+    #data = get_data(urls)

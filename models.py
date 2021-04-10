@@ -22,3 +22,8 @@ class FakeNewsSVM:
 
     def get_model(self):
         return self.model
+
+
+if __name__ == '__main__':
+    model = FakeNewsNN(100, 100, 100).get_model()
+    print(model.summary())
