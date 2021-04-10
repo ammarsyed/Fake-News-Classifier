@@ -1,5 +1,6 @@
 import os
 import newspaper
+import string
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -25,22 +26,31 @@ urls = {
 }
 
 def preprocess_words(dataFrame):
-    print('hello')
+
+    dataFrame = dataFrame.dropna().reset_index()
+
+    dataFrame['text'] = dataFrame['title'] + " " + dataFrame['text']
+
     # Lowercase all letters
     dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
 
-    # Remove stopwords 
+    # for i in range(1, len(dataFrame)):
+    #     try:
+    #         # dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
+    #         dataFrame['text'][i] = dataFrame['text'][i].lower()
+    #     except:
+    #         print(i, dataFrame['text'][i])
+
+
+    # Remove stopwords, punctuation, and numbers
     stop = stopwords.words('english')
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([word for word in word_tokenize(x) if word not in (stop)]))
+    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([word for word in word_tokenize(x) if word not in (stop) and not word in string.punctuation and not word.isdigit()]))
 
-    # Stem
-    ps = PorterStemmer()
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([ps.stem(word) for word in word_tokenize(x)]))
-    
     # Lemmatize
-    lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([lemmatizer(word) for word in word_tokenize(x)]))
+    lemmatizer = WordNetLemmatizer()
+    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([lemmatizer.lemmatize(word) for word in word_tokenize(x)]))
 
+    return dataFrame
 
 
 def combineAndShuffle(dataFrame1, dataFrame2):
@@ -104,6 +114,7 @@ def tfidf_vectorize(corpus):
 
 if __name__ == '__main__':
     # get_scraped_date(urls)
-    data = get_data(urls)
+    data = get_data(urls)[:250]
+    data = preprocess_words(data)
 
-    print(data.head())
+    data.to_csv('processed.csv')
