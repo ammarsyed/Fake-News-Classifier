@@ -1,5 +1,6 @@
 .vscode/
 Data/
+Models/
 .idea/
 .ipynb_checkpoints
 .virtual_documents
