@@ -1,7 +1,15 @@
 import os
 import newspaper
+import string
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+import nltk
+from nltk import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+
 
 urls = {
     'reliable': [
@@ -15,6 +23,28 @@ urls = {
         'https://ussanews.com/News1/'
     ]
 }
+
+
+def preprocess_words(dataFrame):
+    dataFrame = dataFrame.dropna().reset_index()
+    dataFrame['text'] = dataFrame['title'] + " " + dataFrame['text']
+    # Lowercase all letters
+    dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
+    # for i in range(1, len(dataFrame)):
+    #     try:
+    #         # dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
+    #         dataFrame['text'][i] = dataFrame['text'][i].lower()
+    #     except:
+    #         print(i, dataFrame['text'][i])
+    # Remove stopwords, punctuation, and numbers
+    stop = stopwords.words('english')
+    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([word for word in word_tokenize(
+        x) if word not in (stop) and not word in string.punctuation and not word.isdigit()]))
+    # Lemmatize
+    lemmatizer = WordNetLemmatizer()
+    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join(
+        [lemmatizer.lemmatize(word) for word in word_tokenize(x)]))
+    return dataFrame
 
 
 def scrape_data(article_type, url_list):
@@ -73,5 +103,8 @@ def tfidf_vectorize(corpus):
 
 
 if __name__ == '__main__':
-    get_scraped_data(urls)
-    #data = get_data(urls)
+    # get_scraped_date(urls)
+    data = get_data(urls)[:250]
+    data = preprocess_words(data)
+
+    data.to_csv('processed.csv')
