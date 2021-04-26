@@ -1,6 +1,7 @@
 .vscode/
 Data/
 Models/
+__pycache__/
 .idea/
 .ipynb_checkpoints
 .virtual_documents
