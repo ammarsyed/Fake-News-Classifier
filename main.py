@@ -8,6 +8,14 @@ from sklearn.model_selection import train_test_split
 from data import get_preprocessed_data
 from models import FakeNewsNN, FakeNewsSVM
 
+
+
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+import sklearn.metrics as metrics
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('model', type=str)
@@ -28,8 +36,31 @@ if __name__ == '__main__':
     data = data.dropna().reset_index()
     X = data['text']
     y = np.array(data['label'])
+
     if(args.model == 'svm'):
+        print("here")
+        count_vectorizer = CountVectorizer()
+        count_vectorizer.fit_transform(X)
+        freq_term_matrix = count_vectorizer.transform(X)
+        print("done with count vectorizer")
+        tfidf = TfidfTransformer()
+        tfidf.fit(freq_term_matrix)
+        tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
+        print("done with tfidf matrix")
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+
+        print(tf_idf_matrix[0])
+
+        print("split data")
         model = FakeNewsSVM().get_model()
+        print("got model")
+        model.fit(X_train, y_train)
+        print("fit model")
+        y_pred = model.predict(X_test)
+        print('done predicting model')
+        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
+        print(metrics.classification_report(y_test, y_pred))
+
     elif(args.model == 'nn'):
         vocab_size = 10000
         features = 50

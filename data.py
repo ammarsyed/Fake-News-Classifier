@@ -7,7 +7,6 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def scrape_data(article_type, url_list):
@@ -80,7 +79,3 @@ def get_preprocessed_data(urls):
     return data
 
 
-def tfidf_vectorize(corpus):
-    vectorizer = TfidfVectorizer()
-    vectorized_corpus = vectorizer.fit_transform(corpus)
-    return vectorized_corpus
