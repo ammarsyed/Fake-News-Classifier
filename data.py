@@ -1,27 +1,13 @@
 import os
-import newspaper
-import string
-import pandas as pd
 import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer
+import string
+import newspaper
+import pandas as pd
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-
-
-urls = {
-    'reliable': [
-        'https://www.washingtonpost.com/',
-        'https://www.nytimes.com/',
-        'https://www.nbcnews.com/'
-    ],
-    'unreliable': [
-        'https://www.breitbart.com/',
-        'https://www.infowars.com/',
-        'https://ussanews.com/News1/'
-    ]
-}
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def scrape_data(article_type, url_list):
@@ -29,7 +15,6 @@ def scrape_data(article_type, url_list):
     file_name = '{}_scraped_articles.csv'.format(article_type)
     article_label = (0, 1)[article_type == 'unreliable']
     for url in url_list:
-        print(url)
         paper = newspaper.build(url, memoize_articles=False)
         articles = paper.articles
         for i, article in enumerate(articles):
@@ -40,7 +25,6 @@ def scrape_data(article_type, url_list):
                 continue
             if(article.publish_date is None):
                 continue
-            print(i, article.title)
             article_features = {
                 'title': article.title,
                 'text': article.text,
@@ -67,18 +51,13 @@ def get_scraped_data(urls):
 def preprocess(dataFrame):
     dataFrame = dataFrame.dropna().reset_index()
     dataFrame['text'] = dataFrame['title'] + " " + dataFrame['text']
+    dataFrame = dataFrame.drop(['index', 'title', 'Unnamed: 0'], axis=1)
     # Lowercase all letters
     dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
-    # for i in range(1, len(dataFrame)):
-    #     try:
-    #         # dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
-    #         dataFrame['text'][i] = dataFrame['text'][i].lower()
-    #     except:
-    #         print(i, dataFrame['text'][i])
     # Remove stopwords, punctuation, and numbers
     stop = stopwords.words('english')
     dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([word for word in word_tokenize(
-        x) if word not in (stop) and not word in string.punctuation and not word.isdigit()]))
+        x) if (word.isalpha()) and (word not in (stop) and word not in string.punctuation and not word.isdigit())]))
     # Lemmatize
     lemmatizer = WordNetLemmatizer()
     dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join(
@@ -96,7 +75,8 @@ def get_preprocessed_data(urls):
         data = pd.concat([scraped_data, reliable_data,
                           unreliable_data], ignore_index=True)
         data = preprocess(data)
-        data.to_csv('./Data/preprocessed_data.csv')
+        data = data.dropna().reset_index()
+        data.to_csv('./Data/preprocessed_data.csv', index=False)
     return data
 
 
@@ -104,7 +84,3 @@ def tfidf_vectorize(corpus):
     vectorizer = TfidfVectorizer()
     vectorized_corpus = vectorizer.fit_transform(corpus)
     return vectorized_corpus
-
-
-if __name__ == '__main__':
-    data = get_preprocessed_data(urls)
