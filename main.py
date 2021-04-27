@@ -1,14 +1,14 @@
 import os
 import argparse
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.text import one_hot
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+from sklearn.metrics import roc_auc_score, roc_curve
 from data import get_preprocessed_data
 from models import FakeNewsNN, FakeNewsSVM
+from visualizations import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -27,11 +27,14 @@ if __name__ == '__main__':
         ]
     }
     data = get_preprocessed_data(urls)
-    data = data.dropna().reset_index()
+    if(not os.path.exists('./Figures/class_distribution.png')):
+        plot_class_distribution(data)
+    if(not os.path.exists('./Figures/reliable_word_cloud.png') or not os.path.exists('./Figures/unreliable_word_cloud.png')):
+        plot_word_clouds(data)
     X = data['text']
     y = np.array(data['label'])
     if(args.model == 'svm'):
-        model = FakeNewsSVM().get_model()
+        pass
     elif(args.model == 'nn'):
         vocab_size = 10000
         num_features = 50
@@ -39,21 +42,22 @@ if __name__ == '__main__':
         X = [one_hot(x, vocab_size) for x in X]
         X = pad_sequences(X, maxlen=max_text_length)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=22)
-        if(os.path.exists('./Models/fake_news_nn.h5')):
-            model = load_model('./Models/fake_news_nn.h5', compile=True)
-        else:
-            model = FakeNewsNN(vocab_size, num_features,
-                               max_text_length).get_model()
-            model.compile(loss='binary_crossentropy',
-                          optimizer='adam', metrics=['accuracy'])
-            model.fit(X_train, y_train, epochs=1, batch_size=64)
-            model.save('./Models/fake_news_nn.h5')
-        model.evaluate(X_test, y_test)
+            X, y, test_size=0.2)
+        model = FakeNewsNN(vocab_size, num_features,
+                           max_text_length).get_model()
+        model.compile(loss='binary_crossentropy',
+                      optimizer='adam', metrics=['accuracy'])
+        model.fit(X_train, y_train, epochs=1, batch_size=64)
+        #model.evaluate(X_test, y_test)
         y_pred = model.predict(X_test)
         y_pred = np.round(y_pred)
-        #y_pred = y_pred.argmax(axis=1)
-        print(accuracy_score(y_test, y_pred))
-        #print(classification_report(y_test, y_pred))
+        cm = confusion_matrix(y_test, y_pred)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        auc_val = roc_auc_score(y_test, y_pred)
+        plot_confusion_matrix(cm, 'nn', 'CNN-RNN Confusion Matrix')
+        plot_roc_curve(fpr, tpr, 'nn', 'CNN-RNN ROC Curve')
+        print('Accuracy: ', accuracy_score(y_test, y_pred))
+        print('AUC: ', auc_val)
+        print(classification_report(y_test, y_pred))
     else:
         print('Invalid Model Type')

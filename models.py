@@ -1,6 +1,6 @@
 from sklearn.svm import SVC
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, Dropout, Conv1D, MaxPooling1D, LSTM, BatchNormalization, Dense
 
 
 class FakeNewsNN:

@@ -1,13 +1,10 @@
 import os
-import nltk
 import string
 import newspaper
 import pandas as pd
 from nltk import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def scrape_data(article_type, url_list):
@@ -73,11 +70,5 @@ def get_preprocessed_data(urls):
                           unreliable_data], ignore_index=True)
         data = preprocess(data)
         data = data.dropna().reset_index()
-        data.to_csv('./Data/preprocessed_data.csv', index=False)
+        data.to_csv('./Data/preprocessed_data.csv')
     return data
-
-
-def tfidf_vectorize(corpus):
-    vectorizer = TfidfVectorizer()
-    vectorized_corpus = vectorizer.fit_transform(corpus)
-    return vectorized_corpus
