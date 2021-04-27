@@ -4,6 +4,7 @@ import numpy as np
 from tensorflow.keras.preprocessing.text import one_hot
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 from sklearn.metrics import roc_auc_score, roc_curve
 from data import get_preprocessed_data
@@ -34,7 +35,29 @@ if __name__ == '__main__':
     X = data['text']
     y = np.array(data['label'])
     if(args.model == 'svm'):
-        pass
+        count_vectorizer = CountVectorizer()
+        count_vectorizer.fit_transform(X)
+        freq_term_matrix = count_vectorizer.transform(X)
+        tfidf = TfidfTransformer()
+        tfidf.fit(freq_term_matrix)
+        tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        print(tf_idf_matrix[0])
+        print('split data')
+        model = FakeNewsSVM().get_model()
+        print('got model')
+        model.fit(X_train, y_train)
+        print('fit model')
+        y_pred = model.predict(X_test)
+        cm = confusion_matrix(y_test, y_pred)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        auc_val = roc_auc_score(y_test, y_pred)
+        plot_confusion_matrix(cm, 'svm', 'SVM Confusion Matrix')
+        plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
+        print('done predicting model')
+        print('Accuracy: ', accuracy_score(y_test, y_pred))
+        print('AUC: ', auc_val)
+        print(classification_report(y_test, y_pred))
     elif(args.model == 'nn'):
         vocab_size = 10000
         num_features = 50

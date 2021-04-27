@@ -26,7 +26,8 @@ class FakeNewsNN:
 
 class FakeNewsSVM:
     def __init__(self):
-        self.model = SVC()
+        self.model = SVC(kernel='linear', verbose=True) #can try with default (rbf) kernel too
+
 
     def get_model(self):
         return self.model
