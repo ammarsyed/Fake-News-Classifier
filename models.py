@@ -12,12 +12,12 @@ class FakeNewsNN:
         self.model.add(Conv1D(filters=32, kernel_size=5,
                               padding='same', activation='relu'))
         self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Conv1D(filters=64, kernel_size=3,
+        self.model.add(Conv1D(filters=32, kernel_size=5,
                               padding='same', activation='relu'))
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(LSTM(100))
         self.model.add(BatchNormalization())
-        self.model.add(Dense(64, activation='relu'))
+        self.model.add(Dense(32, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
 
     def get_model(self):
@@ -25,9 +25,8 @@ class FakeNewsNN:
 
 
 class FakeNewsSVM:
-    def __init__(self):
-        self.model = SVC(kernel='linear', verbose=True) #can try with default (rbf) kernel too
-
+    def __init__(self, kernel, verbose=True):
+        self.model = SVC(kernel=kernel, verbose=verbose)
 
     def get_model(self):
         return self.model

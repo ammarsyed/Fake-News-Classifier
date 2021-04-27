@@ -1,4 +1,5 @@
 import os
+import pickle
 import argparse
 import numpy as np
 from tensorflow.keras.preprocessing.text import one_hot
@@ -41,39 +42,44 @@ if __name__ == '__main__':
         tfidf = TfidfTransformer()
         tfidf.fit(freq_term_matrix)
         tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
-        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
-        print(tf_idf_matrix[0])
-        print('split data')
-        model = FakeNewsSVM().get_model()
-        print('got model')
-        model.fit(X_train, y_train)
-        print('fit model')
+        X_train, X_test, y_train, y_test = train_test_split(
+            tf_idf_matrix, y, test_size=0.25, random_state=42)
+        if(os.path.exists('./Models/fake_news_svm.pickle')):
+            model = pickle.load(open('./Models/fake_news_svm.pickle', 'rb'))
+        else:
+            model = FakeNewsSVM('linear').get_model()
+            print('Training SVM Model')
+            model.fit(X_train, y_train)
+            pickle.dump(model, open('./Models/fake_news_svm.pickle', 'wb'))
+        print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
+        print('Generating Figures and Reporting Results')
         cm = confusion_matrix(y_test, y_pred)
         fpr, tpr, thresholds = roc_curve(y_test, y_pred)
         auc_val = roc_auc_score(y_test, y_pred)
         plot_confusion_matrix(cm, 'svm', 'SVM Confusion Matrix')
         plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
-        print('done predicting model')
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
         print(classification_report(y_test, y_pred))
     elif(args.model == 'nn'):
-        vocab_size = 10000
-        num_features = 50
-        max_text_length = 5000
+        vocab_size = 5000
+        num_features = 40
+        max_text_length = 3000
         X = [one_hot(x, vocab_size) for x in X]
         X = pad_sequences(X, maxlen=max_text_length)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2)
+            X, y, test_size=0.25, random_state=42)
         model = FakeNewsNN(vocab_size, num_features,
                            max_text_length).get_model()
         model.compile(loss='binary_crossentropy',
                       optimizer='adam', metrics=['accuracy'])
-        model.fit(X_train, y_train, epochs=1, batch_size=64)
+        model.fit(X_train, y_train, epochs=2, batch_size=32)
         #model.evaluate(X_test, y_test)
+        print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
         y_pred = np.round(y_pred)
+        print('Generating Figures and Reporting Results')
         cm = confusion_matrix(y_test, y_pred)
         fpr, tpr, thresholds = roc_curve(y_test, y_pred)
         auc_val = roc_auc_score(y_test, y_pred)
