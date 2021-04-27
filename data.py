@@ -1,11 +1,9 @@
 import os
-import nltk
 import string
 import newspaper
 import pandas as pd
 from nltk import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 
 
@@ -30,7 +28,7 @@ def scrape_data(article_type, url_list):
                 'label': article_label
             }
             data.append(article_features)
-    df = pd.DataFrame(data)
+    df = pd.data(data)
     df = df.drop_duplicates()
     df.to_csv('./Data/{}'.format(file_name))
     return df
@@ -47,21 +45,18 @@ def get_scraped_data(urls):
     return pd.concat([reliable_articles, unreliable_articles], ignore_index=True)
 
 
-def preprocess(dataFrame):
-    dataFrame = dataFrame.dropna().reset_index()
-    dataFrame['text'] = dataFrame['title'] + " " + dataFrame['text']
-    dataFrame = dataFrame.drop(['index', 'title', 'Unnamed: 0'], axis=1)
-    # Lowercase all letters
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: x.lower())
-    # Remove stopwords, punctuation, and numbers
+def preprocess(data):
+    data = data.dropna().reset_index()
+    data['text'] = data['title'] + " " + data['text']
+    data = data.drop(['index', 'title', 'Unnamed: 0'], axis=1)
+    data['text'] = data['text'].apply(lambda x: x.lower())
     stop = stopwords.words('english')
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join([word for word in word_tokenize(
+    data['text'] = data['text'].apply(lambda x: ' '.join([word for word in word_tokenize(
         x) if (word.isalpha()) and (word not in (stop) and word not in string.punctuation and not word.isdigit())]))
-    # Lemmatize
     lemmatizer = WordNetLemmatizer()
-    dataFrame['text'] = dataFrame['text'].apply(lambda x: ' '.join(
+    data['text'] = data['text'].apply(lambda x: ' '.join(
         [lemmatizer.lemmatize(word) for word in word_tokenize(x)]))
-    return dataFrame
+    return data
 
 
 def get_preprocessed_data(urls):
@@ -75,7 +70,5 @@ def get_preprocessed_data(urls):
                           unreliable_data], ignore_index=True)
         data = preprocess(data)
         data = data.dropna().reset_index()
-        data.to_csv('./Data/preprocessed_data.csv', index=False)
+        data.to_csv('./Data/preprocessed_data.csv')
     return data
-
-
