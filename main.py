@@ -6,9 +6,7 @@ from tensorflow.keras.preprocessing.text import one_hot
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from data import get_preprocessed_data
-from models import FakeNewsNN, FakeNewsSVM
-
-
+from models import FakeNewsNN, FakeNewsSVM, FakeNewsLogisticRegression, FakeNewsNaiveBayes, FakeNewsDecisionTree
 
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -37,29 +35,26 @@ if __name__ == '__main__':
     X = data['text']
     y = np.array(data['label'])
 
+    count_vectorizer = CountVectorizer()
+    count_vectorizer.fit_transform(X)
+    freq_term_matrix = count_vectorizer.transform(X)
+
+    tfidf = TfidfTransformer()
+    tfidf.fit(freq_term_matrix)
+    tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
+
     if(args.model == 'svm'):
-        print("here")
-        count_vectorizer = CountVectorizer()
-        count_vectorizer.fit_transform(X)
-        freq_term_matrix = count_vectorizer.transform(X)
-        print("done with count vectorizer")
-        tfidf = TfidfTransformer()
-        tfidf.fit(freq_term_matrix)
-        tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
-        print("done with tfidf matrix")
+
         X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
-
-        print(tf_idf_matrix[0])
-
-        print("split data")
         model = FakeNewsSVM().get_model()
-        print("got model")
         model.fit(X_train, y_train)
-        print("fit model")
         y_pred = model.predict(X_test)
-        print('done predicting model')
+
         print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
         print(metrics.classification_report(y_test, y_pred))
+
+
+
 
     elif(args.model == 'nn'):
         vocab_size = 10000
@@ -77,5 +72,38 @@ if __name__ == '__main__':
                           optimizer='adam', metrics=['accuracy'])
             model.fit(X_train, y_train, epochs=1, batch_size=64)
         model.evaluate(X_test, y_test)
+
+    elif args.model == 'logreg':
+
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        model = FakeNewsLogisticRegression().get_model()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
+        print(metrics.classification_report(y_test, y_pred))
+
+
+
+    elif args.model =='nb':
+
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        model = FakeNewsNaiveBayes().get_model()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
+        print(metrics.classification_report(y_test, y_pred))
+
+    elif args.model == 'dt':
+
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        model = FakeNewsDecisionTree().get_model()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
+        print(metrics.classification_report(y_test, y_pred))
+
     else:
         print('Invalid Model Type')

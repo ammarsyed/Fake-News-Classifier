@@ -1,4 +1,9 @@
 from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import  MultinomialNB
+
+from sklearn.tree import DecisionTreeClassifier
+
 from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
 
@@ -23,8 +28,31 @@ class FakeNewsNN:
 
 class FakeNewsSVM:
     def __init__(self):
-        self.model = SVC(kernel='linear', verbose=True) #can try with default (rbf) kernel too
+        self.model = SVC(kernel='linear')
 
 
     def get_model(self):
         return self.model
+
+class FakeNewsLogisticRegression:
+    def __init__(self):
+        self.model = LogisticRegression()
+
+    def get_model(self):
+        return self.model
+
+
+class FakeNewsNaiveBayes:
+    def __init__(self):
+        self.model = MultinomialNB()
+
+    def get_model(self):
+        return self.model
+
+class FakeNewsDecisionTree:
+    def __init__(self):
+        self.model = DecisionTreeClassifier()
+
+    def get_model(self):
+        return self.model
+
