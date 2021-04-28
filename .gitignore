@@ -1,7 +1,4 @@
 .vscode/
-Data/
-Models/
-Figures/
 __pycache__/
 .idea/
 .ipynb_checkpoints

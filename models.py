@@ -1,4 +1,11 @@
 from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import  MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+
+from tensorflow.keras.models import *
+from tensorflow.keras.layers import *
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, Dropout, Conv1D, MaxPooling1D, LSTM, BatchNormalization, Dense
 
@@ -25,8 +32,30 @@ class FakeNewsNN:
 
 
 class FakeNewsSVM:
-    def __init__(self, kernel, verbose=True):
+    def __init__(self, kernel, verbose=False):
         self.model = SVC(kernel=kernel, verbose=verbose)
+
+    def get_model(self):
+        return self.model
+
+
+class FakeNewsNaiveBayes:
+    def __init__(self):
+        self.model = MultinomialNB()
+
+    def get_model(self):
+        return self.model
+
+class FakeNewsDecisionTree:
+    def __init__(self):
+        self.model = DecisionTreeClassifier()
+
+    def get_model(self):
+        return self.model
+
+class FakeNewsLogisticRegression:
+    def __init__(self):
+        self.model = LogisticRegression()
 
     def get_model(self):
         return self.model

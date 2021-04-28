@@ -23,7 +23,7 @@ The `requirements.txt` contains a list of all Python libraries and cooresponding
 
 ### Running Code
 
-In order to run the code, the main file must be run with the command `python main.py "model_name"`, where `model_name` is a string command line argument that represents the type of model the program will run. Input `"svm"` in place of `"model_name"` in order to run the program for the Support Vector Machines model and input `"nn"` in place of `"model_name"` in order to run the program for the Neural Network model. If any other string is inputted for the command line argument, then the program will simply display the output `Invalid Model Type` to the console and terminate.
+In order to run the code, the main file must be run with the command `python main.py "model_name"`, where `model_name` is a string command line argument that represents the type of model the program will run. Input `"svm"` in place of `"model_name"` in order to run the program for the Support Vector Machines model and input `"nn"` in place of `"model_name"` in order to run the program for the Neural Network model. To run other supported models, input `"logreg"` for a Logistic Regression Model, `"nb"` for a Naive Bayes Model, and `"dt"` for a Decision Tree model. If any other string is inputted for the command line argument, then the program will simply display the output `Invalid Model Type` to the console and terminate.
 
 ### Code Output
 
