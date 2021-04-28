@@ -10,12 +10,6 @@ from sklearn.metrics import confusion_matrix, classification_report, accuracy_sc
 from sklearn.metrics import roc_auc_score, roc_curve
 from data import get_preprocessed_data
 from models import FakeNewsNN, FakeNewsSVM, FakeNewsLogisticRegression, FakeNewsNaiveBayes, FakeNewsDecisionTree
-
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-import sklearn.metrics as metrics
 from visualizations import *
 
 if __name__ == '__main__':
@@ -81,7 +75,6 @@ if __name__ == '__main__':
         model.compile(loss='binary_crossentropy',
                       optimizer='adam', metrics=['accuracy'])
         model.fit(X_train, y_train, epochs=2, batch_size=32)
-        #model.evaluate(X_test, y_test)
         print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
         y_pred = np.round(y_pred)
@@ -94,40 +87,65 @@ if __name__ == '__main__':
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
         print(classification_report(y_test, y_pred, digits=4))
-
-    elif args.model == 'logreg':
-
+    elif(args.model == 'logreg'):
         X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
-        model = FakeNewsLogisticRegression().get_model()
-        model.fit(X_train, y_train)
-        model.fit(X_train, y_train)
+        if(os.path.exists('./Models/fake_news_logreg.pickle')):
+            model = pickle.load(open('./Models/fake_news_logreg.pickle', 'rb'))
+        else:
+            model = FakeNewsLogisticRegression().get_model()
+            print('Training Logistic Regression Model')
+            model.fit(X_train, y_train)
+            pickle.dump(model, open('./Models/fake_news_logreg.pickle', 'wb'))
+        print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
-
-        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
-        print(metrics.classification_report(y_test, y_pred))
-
-
-
-    elif args.model =='nb':
-
+        print('Generating Figures and Reporting Results')
+        cm = confusion_matrix(y_test, y_pred)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        auc_val = roc_auc_score(y_test, y_pred)
+        plot_confusion_matrix(cm, 'svm', 'SVM Confusion Matrix')
+        plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
+        print('Accuracy: ', accuracy_score(y_test, y_pred))
+        print('AUC: ', auc_val)
+        print(classification_report(y_test, y_pred, digits=4))
+    elif(args.model =='nb'):
         X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
-        model = FakeNewsNaiveBayes().get_model()
-        model.fit(X_train, y_train)
+        if(os.path.exists('./Models/fake_news_nb.pickle')):
+            model = pickle.load(open('./Models/fake_news_nb.pickle', 'rb'))
+        else:
+            model = FakeNewsNaiveBayes().get_model()
+            print('Training Naive Bayes Model')
+            model.fit(X_train, y_train)
+            pickle.dump(model, open('./Models/fake_news_nb.pickle', 'wb'))
+        print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
-
-        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
-        print(metrics.classification_report(y_test, y_pred))
-
-    elif args.model == 'dt':
-
+        print('Generating Figures and Reporting Results')
+        cm = confusion_matrix(y_test, y_pred)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        auc_val = roc_auc_score(y_test, y_pred)
+        plot_confusion_matrix(cm, 'svm', 'SVM Confusion Matrix')
+        plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
+        print('Accuracy: ', accuracy_score(y_test, y_pred))
+        print('AUC: ', auc_val)
+        print(classification_report(y_test, y_pred, digits=4))
+    elif(args.model == 'dt)':
         X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
-        model = FakeNewsDecisionTree().get_model()
-        model.fit(X_train, y_train)
+        if(os.path.exists('./Models/fake_news_dt.pickle')):
+            model = pickle.load(open('./Models/fake_news_dt.pickle', 'rb'))
+        else:
+            model = FakeNewsDecisionTree().get_model()
+            print('Training Decision Tree Model')
+            model.fit(X_train, y_train)
+            pickle.dump(model, open('./Models/fake_news_dt.pickle', 'wb'))
+        print('Making Predictions on Test Data')
         y_pred = model.predict(X_test)
-
-        print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
-        print(metrics.classification_report(y_test, y_pred))
-
-
+        print('Generating Figures and Reporting Results')
+        cm = confusion_matrix(y_test, y_pred)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        auc_val = roc_auc_score(y_test, y_pred)
+        plot_confusion_matrix(cm, 'svm', 'SVM Confusion Matrix')
+        plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
+        print('Accuracy: ', accuracy_score(y_test, y_pred))
+        print('AUC: ', auc_val)
+        print(classification_report(y_test, y_pred, digits=4))
     else:
         print('Invalid Model Type')
