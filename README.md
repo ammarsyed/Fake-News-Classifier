@@ -1,4 +1,4 @@
-# CIS4930 Natural Language Processing with Python Project - Fake News Classification
+# Natural Language Processing with Python - Fake News Classification
 
 ## Abinai Pasunuri, Ammar Syed
 
