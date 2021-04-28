@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     elif args.model == 'logreg':
 
-        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
         model = FakeNewsLogisticRegression().get_model()
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     elif args.model =='nb':
 
-        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
         model = FakeNewsNaiveBayes().get_model()
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     elif args.model == 'dt':
 
-        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y)
+        X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
         model = FakeNewsDecisionTree().get_model()
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
