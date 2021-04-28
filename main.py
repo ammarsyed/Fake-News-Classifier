@@ -41,18 +41,13 @@ if __name__ == '__main__':
         plot_word_clouds(data)
     X = data['text']
     y = np.array(data['label'])
-
-
     count_vectorizer = CountVectorizer()
     count_vectorizer.fit_transform(X)
     freq_term_matrix = count_vectorizer.transform(X)
     tfidf = TfidfTransformer()
     tfidf.fit(freq_term_matrix)
     tf_idf_matrix = tfidf.fit_transform(freq_term_matrix)
-
-
     if(args.model == 'svm'):
-        
         X_train, X_test, y_train, y_test = train_test_split(
             tf_idf_matrix, y, test_size=0.25, random_state=42)
         if(os.path.exists('./Models/fake_news_svm.pickle')):
@@ -72,9 +67,7 @@ if __name__ == '__main__':
         plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
-        print(classification_report(y_test, y_pred))
-
-
+        print(classification_report(y_test, y_pred, digits=4))
     elif(args.model == 'nn'):
         vocab_size = 5000
         num_features = 40
@@ -100,7 +93,7 @@ if __name__ == '__main__':
         plot_roc_curve(fpr, tpr, 'nn', 'CNN-RNN ROC Curve')
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
-        print(classification_report(y_test, y_pred))
+        print(classification_report(y_test, y_pred, digits=4))
 
     elif args.model == 'logreg':
 

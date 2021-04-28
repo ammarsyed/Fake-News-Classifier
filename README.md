@@ -4,7 +4,7 @@
 
 ### Code Base Structure
 
-The following is the code base of the project. It consists of 4 main files:
+The following is the code base of the project. It consists of four main `.py` files:
 
 - `main.py`: It is the main program, which loads in the preprocessed data, initializes the two models, trains the models, and generates the different evaluation metrics and plots of the models.
 - `data.py`: It contains various functions to scrape, load, and preprocess the news articles corpus. Program starts with scraping all news articles contents from provided urls, with the Python Newspaper library. It then combines the local CSV dataset with the scraped dataset, and lastly preprocesses the combined data, with Pandas, Numpy, and NLTK libraries.
