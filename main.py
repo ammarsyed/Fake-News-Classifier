@@ -107,6 +107,7 @@ if __name__ == '__main__':
         X_train, X_test, y_train, y_test = train_test_split(tf_idf_matrix, y, test_size=0.25, random_state=42)
         model = FakeNewsLogisticRegression().get_model()
         model.fit(X_train, y_train)
+        model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
         print("Accuracy is:", metrics.accuracy_score(y_test, y_pred))
