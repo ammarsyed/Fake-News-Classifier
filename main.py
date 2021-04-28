@@ -61,7 +61,7 @@ if __name__ == '__main__':
         plot_roc_curve(fpr, tpr, 'svm', 'SVM ROC Curve')
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
-        print(classification_report(y_test, y_pred))
+        print(classification_report(y_test, y_pred, digits=4))
     elif(args.model == 'nn'):
         vocab_size = 5000
         num_features = 40
@@ -87,6 +87,6 @@ if __name__ == '__main__':
         plot_roc_curve(fpr, tpr, 'nn', 'CNN-RNN ROC Curve')
         print('Accuracy: ', accuracy_score(y_test, y_pred))
         print('AUC: ', auc_val)
-        print(classification_report(y_test, y_pred))
+        print(classification_report(y_test, y_pred, digits=4))
     else:
         print('Invalid Model Type')
