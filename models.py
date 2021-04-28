@@ -46,6 +46,7 @@ class FakeNewsNaiveBayes:
     def get_model(self):
         return self.model
 
+    
 class FakeNewsDecisionTree:
     def __init__(self):
         self.model = DecisionTreeClassifier()
@@ -53,6 +54,7 @@ class FakeNewsDecisionTree:
     def get_model(self):
         return self.model
 
+    
 class FakeNewsLogisticRegression:
     def __init__(self):
         self.model = LogisticRegression()
